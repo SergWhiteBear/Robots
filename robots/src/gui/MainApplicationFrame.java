@@ -5,6 +5,8 @@ import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
+import java.io.FileInputStream;
+import java.util.Properties;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
@@ -28,9 +30,19 @@ public class MainApplicationFrame extends JFrame {
 
   private final JDesktopPane desktopPane = new JDesktopPane();
 
+  private final GameWindow gameWindow;
+  private final LogWindow logWindow;
+  private final Properties cfg = new Properties();
   public MainApplicationFrame(LanguageInterface language) {
     //Make the big window be indented 50 pixels from each edge
     //of the screen.
+
+    String cfgPath = "config.properties";
+    try (FileInputStream cfgInput = new FileInputStream(cfgPath)) {
+      cfg.load(cfgInput);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
 
     language.setLanguage();
     int inset = 50;
@@ -39,12 +51,12 @@ public class MainApplicationFrame extends JFrame {
 
     setContentPane(desktopPane);
 
-    LogWindow logWindow = createLogWindow();
+    logWindow = createLogWindow();
+    gameWindow = createGameWindow();
     addWindow(logWindow);
-
-    GameWindow gameWindow = new GameWindow();
-    gameWindow.setSize(400, 400);
     addWindow(gameWindow);
+
+    loadWindows();
 
     setJMenuBar(generateMenuBar());
     setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -60,39 +72,37 @@ public class MainApplicationFrame extends JFrame {
     return logWindow;
   }
 
+  protected GameWindow createGameWindow(){
+    GameWindow gameWindow = new GameWindow();
+    gameWindow.setVisible(true);
+    gameWindow.setLocation(20, 20);
+    gameWindow.setSize(400,400);
+    setMinimumSize(gameWindow.getSize());
+    return gameWindow;
+  }
+
+  private void saveWindows() {
+    if (Boolean.parseBoolean(cfg.getProperty("isGameWindowSerializable"))) {
+      gameWindow.save(cfg.getProperty("gameWindowOutPath"));
+    }
+    if (Boolean.parseBoolean(cfg.getProperty("isLogWindowSerializable"))) {
+      logWindow.save(cfg.getProperty("logWindowOutPath"));
+    }
+  }
+  private void loadWindows() {
+    if (Boolean.parseBoolean(cfg.getProperty("isGameWindowSerializable"))) {
+      gameWindow.load(cfg.getProperty("gameWindowOutPath"));
+    }
+    if (Boolean.parseBoolean(cfg.getProperty("isLogWindowSerializable"))) {
+      logWindow.load(cfg.getProperty("logWindowOutPath"));
+    }
+    this.invalidate();
+  }
+
   protected void addWindow(JInternalFrame frame) {
     desktopPane.add(frame);
     frame.setVisible(true);
   }
-
-//    protected JMenuBar createMenuBar() {
-//        JMenuBar menuBar = new JMenuBar();
-//
-//        //Set up the lone menu.
-//        JMenu menu = new JMenu("Document");
-//        menu.setMnemonic(KeyEvent.VK_D);
-//        menuBar.add(menu);
-//
-//        //Set up the first menu item.
-//        JMenuItem menuItem = new JMenuItem("New");
-//        menuItem.setMnemonic(KeyEvent.VK_N);
-//        menuItem.setAccelerator(KeyStroke.getKeyStroke(
-//                KeyEvent.VK_N, ActionEvent.ALT_MASK));
-//        menuItem.setActionCommand("new");
-////        menuItem.addActionListener(this);
-//        menu.add(menuItem);
-//
-//        //Set up the second menu item.
-//        menuItem = new JMenuItem("Quit");
-//        menuItem.setMnemonic(KeyEvent.VK_Q);
-//        menuItem.setAccelerator(KeyStroke.getKeyStroke(
-//                KeyEvent.VK_Q, ActionEvent.ALT_MASK));
-//        menuItem.setActionCommand("quit");
-////        menuItem.addActionListener(this);
-//        menu.add(menuItem);
-//
-//        return menuBar;
-//    }
 
   private JMenuBar generateMenuBar() {
     JMenuBar menuBar = new JMenuBar();
@@ -143,6 +153,7 @@ public class MainApplicationFrame extends JFrame {
         "Окно подтверждения",
         JOptionPane.YES_NO_OPTION);
     if (select == JOptionPane.YES_OPTION) {
+      saveWindows();
       dispose();
       System.exit(0);
     }
