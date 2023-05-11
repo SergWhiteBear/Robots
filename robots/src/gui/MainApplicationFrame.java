@@ -4,10 +4,8 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.io.FileInputStream;
+import java.util.*;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
@@ -35,6 +33,9 @@ public class MainApplicationFrame extends JFrame {
     private JMenu VisionMenu;
     private JMenu TestMenu;
     private JMenu CloseMenu;
+    private final GameWindow gameWindow;
+    private final LogWindow logWindow;
+    private final Properties cfg = new Properties();
     private final JDesktopPane desktopPane = new JDesktopPane();
     public List<JMenuItem> MenuItem = new ArrayList<>();
 
@@ -42,31 +43,65 @@ public class MainApplicationFrame extends JFrame {
 
         //Make the big window be indented 50 pixels from each edge
         //of the screen.
+
+        String cfgPath = "robots/src/config.properties";
+        try (FileInputStream cfgInput = new FileInputStream(cfgPath)) {
+            cfg.load(cfgInput);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         int inset = 50;
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setBounds(inset, inset, screenSize.width - inset * 2, screenSize.height - inset * 2);
 
-    setContentPane(desktopPane);
+        setContentPane(desktopPane);
 
-        addWindow(createLogWindow());
-        addWindow(new GameWindow() {
-            {
-                setSize(400, 400);
-            }
-        });
+        logWindow = createLogWindow();
+        gameWindow = createGameWindow();
+        addWindow(logWindow);
+        addWindow(gameWindow);
+        loadWindows();
         setJMenuBar(generateMenuBar());
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
-  protected LogWindow createLogWindow() {
-    LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource());
-    logWindow.setLocation(10, 10);
-    logWindow.setSize(300, 800);
-    setMinimumSize(logWindow.getSize());
-    logWindow.pack();
-    Logger.debug("Протокол работает");
-    return logWindow;
-  }
+    protected LogWindow createLogWindow() {
+        LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource());
+        logWindow.setLocation(10, 10);
+        logWindow.setSize(300, 800);
+        setMinimumSize(logWindow.getSize());
+        logWindow.pack();
+        Logger.debug("Протокол работает");
+        return logWindow;
+    }
+
+    protected GameWindow createGameWindow(){
+        GameWindow gameWindow = new GameWindow();
+        gameWindow.setVisible(true);
+        gameWindow.setLocation(20, 20);
+        gameWindow.setSize(400,400);
+        setMinimumSize(gameWindow.getSize());
+        return gameWindow;
+    }
+
+    private void saveWindows() {
+        if (Boolean.parseBoolean(cfg.getProperty("isGameWindowSerializable"))) {
+            gameWindow.save(cfg.getProperty("gameWindowOutPath"));
+        }
+        if (Boolean.parseBoolean(cfg.getProperty("isLogWindowSerializable"))) {
+            logWindow.save(cfg.getProperty("logWindowOutPath"));
+        }
+    }
+    private void loadWindows() {
+        if (Boolean.parseBoolean(cfg.getProperty("isGameWindowSerializable"))) {
+            gameWindow.load(cfg.getProperty("gameWindowOutPath"));
+        }
+        if (Boolean.parseBoolean(cfg.getProperty("isLogWindowSerializable"))) {
+            logWindow.load(cfg.getProperty("logWindowOutPath"));
+        }
+        this.invalidate();
+    }
 
     protected void addWindow(JInternalFrame frame) {
         desktopPane.add(frame);
@@ -188,6 +223,7 @@ public class MainApplicationFrame extends JFrame {
                 JOptionPane.YES_NO_OPTION);
 
         if (select == JOptionPane.YES_OPTION) {
+            saveWindows();
             dispose();
             System.exit(0);
         }
