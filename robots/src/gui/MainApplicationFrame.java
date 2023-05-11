@@ -4,9 +4,11 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
-import java.io.FileInputStream;
-import java.util.Properties;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
@@ -18,7 +20,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import localization.LanguageInterface;
+
 import log.Logger;
 
 
@@ -28,39 +30,33 @@ import log.Logger;
  */
 public class MainApplicationFrame extends JFrame {
 
-  private final JDesktopPane desktopPane = new JDesktopPane();
+    public ResourceBundle bundle;
+    private JMenu langMenu;
+    private JMenu VisionMenu;
+    private JMenu TestMenu;
+    private JMenu CloseMenu;
+    private final JDesktopPane desktopPane = new JDesktopPane();
+    public List<JMenuItem> MenuItem = new ArrayList<>();
 
-  private final GameWindow gameWindow;
-  private final LogWindow logWindow;
-  private final Properties cfg = new Properties();
-  public MainApplicationFrame(LanguageInterface language) {
-    //Make the big window be indented 50 pixels from each edge
-    //of the screen.
+    public MainApplicationFrame() {
 
-    String cfgPath = "config.properties";
-    try (FileInputStream cfgInput = new FileInputStream(cfgPath)) {
-      cfg.load(cfgInput);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
-    language.setLanguage();
-    int inset = 50;
-    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    setBounds(inset, inset, screenSize.width - inset * 2, screenSize.height - inset * 2);
+        //Make the big window be indented 50 pixels from each edge
+        //of the screen.
+        int inset = 50;
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        setBounds(inset, inset, screenSize.width - inset * 2, screenSize.height - inset * 2);
 
     setContentPane(desktopPane);
 
-    logWindow = createLogWindow();
-    gameWindow = createGameWindow();
-    addWindow(logWindow);
-    addWindow(gameWindow);
-
-    loadWindows();
-
-    setJMenuBar(generateMenuBar());
-    setDefaultCloseOperation(EXIT_ON_CLOSE);
-  }
+        addWindow(createLogWindow());
+        addWindow(new GameWindow() {
+            {
+                setSize(400, 400);
+            }
+        });
+        setJMenuBar(generateMenuBar());
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+    }
 
   protected LogWindow createLogWindow() {
     LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource());
@@ -72,106 +68,145 @@ public class MainApplicationFrame extends JFrame {
     return logWindow;
   }
 
-  protected GameWindow createGameWindow(){
-    GameWindow gameWindow = new GameWindow();
-    gameWindow.setVisible(true);
-    gameWindow.setLocation(20, 20);
-    gameWindow.setSize(400,400);
-    setMinimumSize(gameWindow.getSize());
-    return gameWindow;
-  }
-
-  private void saveWindows() {
-    if (Boolean.parseBoolean(cfg.getProperty("isGameWindowSerializable"))) {
-      gameWindow.save(cfg.getProperty("gameWindowOutPath"));
+    protected void addWindow(JInternalFrame frame) {
+        desktopPane.add(frame);
+        frame.setVisible(true);
     }
-    if (Boolean.parseBoolean(cfg.getProperty("isLogWindowSerializable"))) {
-      logWindow.save(cfg.getProperty("logWindowOutPath"));
+
+    private void updateLanguage(Locale locale) {
+        //Читаем переводы слов из файла с нужным нам языком
+        bundle = ResourceBundle.getBundle("resources.MyResources", locale);
+        //Заменяем названия менюшек и прочего
+        langMenu.setText(bundle.getString("Язык"));
+        VisionMenu.setText(bundle.getString("Режим отображения"));
+        TestMenu.setText(bundle.getString("Тесты"));
+        CloseMenu.setText(bundle.getString("Приложение"));
+        UIManager.put("OptionPane.yesButtonText", bundle.getString("Да"));
+        UIManager.put("OptionPane.noButtonText", bundle.getString("Нет"));
+        //Пробегаем по пунктам во всех вкладках и заменяем их
+        for (JMenuItem item : MenuItem) {
+            item.setText(bundle.getString(item.getText()));
+        }
+        pack();
     }
-  }
-  private void loadWindows() {
-    if (Boolean.parseBoolean(cfg.getProperty("isGameWindowSerializable"))) {
-      gameWindow.load(cfg.getProperty("gameWindowOutPath"));
+
+//    protected JMenuBar createMenuBar() {
+//        JMenuBar menuBar = new JMenuBar();
+//
+//        //Set up the lone menu.
+//        JMenu menu = new JMenu("Document");
+//        menu.setMnemonic(KeyEvent.VK_D);
+//        menuBar.add(menu);
+//
+//        //Set up the first menu item.
+//        JMenuItem menuItem = new JMenuItem("New");
+//        menuItem.setMnemonic(KeyEvent.VK_N);
+//        menuItem.setAccelerator(KeyStroke.getKeyStroke(
+//                KeyEvent.VK_N, ActionEvent.ALT_MASK));
+//        menuItem.setActionCommand("new");
+////        menuItem.addActionListener(this);
+//        menu.add(menuItem);
+//
+//        //Set up the second menu item.
+//        menuItem = new JMenuItem("Quit");
+//        menuItem.setMnemonic(KeyEvent.VK_Q);
+//        menuItem.setAccelerator(KeyStroke.getKeyStroke(
+//                KeyEvent.VK_Q, ActionEvent.ALT_MASK));
+//        menuItem.setActionCommand("quit");
+////        menuItem.addActionListener(this);
+//        menu.add(menuItem);
+//
+//        return menuBar;
+//    }
+
+
+    private JMenuBar generateMenuBar() {
+        JMenuBar menuBar = new JMenuBar();
+        menuBar.add(generateLangMenu());
+        menuBar.add(generateCloseMenu());
+        menuBar.add(generateMappingMenu());
+        menuBar.add(generateTestMenu());
+        return menuBar;
     }
-    if (Boolean.parseBoolean(cfg.getProperty("isLogWindowSerializable"))) {
-      logWindow.load(cfg.getProperty("logWindowOutPath"));
+
+    private JMenu generateLangMenu() {
+        langMenu = new JMenu("Язык");
+
+        langMenu.setMnemonic(KeyEvent.VK_F);
+        langMenu.getAccessibleContext().setAccessibleDescription("Языки");
+        langMenu.add(generateMenuItem("Русский", KeyEvent.VK_N, event -> {
+            updateLanguage(new Locale("ru", "RU"));
+            invalidate();
+        }));
+
+        langMenu.add(generateMenuItem("Français", KeyEvent.VK_N, event -> {
+            updateLanguage(new Locale("fr", "FR"));
+            invalidate();
+        }));
+        return langMenu;
     }
-    this.invalidate();
-  }
 
-  protected void addWindow(JInternalFrame frame) {
-    desktopPane.add(frame);
-    frame.setVisible(true);
-  }
-
-  private JMenuBar generateMenuBar() {
-    JMenuBar menuBar = new JMenuBar();
-    menuBar.add(generateCloseMenu());
-    menuBar.add(generateMappingMenu());
-    menuBar.add(generateTestMenu());
-    return menuBar;
-  }
-
-  private JMenu generateMappingMenu() {
-    JMenu lookAndFeelMenu = new JMenu("Режим отображения");
-    lookAndFeelMenu.setMnemonic(KeyEvent.VK_V);
-    lookAndFeelMenu.getAccessibleContext()
-        .setAccessibleDescription("Управление режимом отображения приложения");
-    lookAndFeelMenu.add(generateMenuItem("Системная схема", KeyEvent.VK_S, event -> {
-      setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-      invalidate();
-    }));
-    lookAndFeelMenu.add(generateMenuItem("Универсальная схема", KeyEvent.VK_S, event -> {
-      setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-      invalidate();
-    }));
-    return lookAndFeelMenu;
-  }
-
-  private JMenu generateTestMenu() {
-    JMenu testMenu = new JMenu("Тесты");
-    testMenu.setMnemonic(KeyEvent.VK_T);
-    testMenu.getAccessibleContext().setAccessibleDescription("Тестовые команды");
-    testMenu.add(generateMenuItem("Сообщение в лог", KeyEvent.VK_S, event -> {
-      Logger.debug("Новая строка");
-    }));
-    return testMenu;
-  }
-
-  private JMenu generateCloseMenu() {
-    JMenu closeMenu = new JMenu("Приложение");
-    closeMenu.setMnemonic(KeyEvent.VK_ESCAPE);
-    closeMenu.getAccessibleContext().setAccessibleDescription("Закрыть");
-    closeMenu.add(generateMenuItem("Выход", KeyEvent.VK_ESCAPE, event -> {
-      showConfirmDialog();
-    }));
-    return closeMenu;
-  }
-
-  public void showConfirmDialog() {
-    int select = JOptionPane.showConfirmDialog(this, "Вы уверены?",
-        "Окно подтверждения",
-        JOptionPane.YES_NO_OPTION);
-    if (select == JOptionPane.YES_OPTION) {
-      saveWindows();
-      dispose();
-      System.exit(0);
+    private JMenu generateMappingMenu() {
+        VisionMenu = new JMenu("Режим отображения");
+        VisionMenu.setMnemonic(KeyEvent.VK_V);
+        VisionMenu.getAccessibleContext()
+                .setAccessibleDescription("Управление режимом отображения приложения");
+        VisionMenu.add(generateMenuItem("Системная схема", KeyEvent.VK_S, event -> {
+            setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            invalidate();
+        }));
+        VisionMenu.add(generateMenuItem("Универсальная схема", KeyEvent.VK_S, event -> {
+            setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+            invalidate();
+        }));
+        return VisionMenu;
     }
-  }
 
-  private JMenuItem generateMenuItem(String name, int keyEvent, ActionListener actionListener) {
-    JMenuItem item = new JMenuItem(name, keyEvent);
-    item.addActionListener(actionListener);
-    return item;
-  }
-
-  private void setLookAndFeel(String className) {
-    try {
-      UIManager.setLookAndFeel(className);
-      SwingUtilities.updateComponentTreeUI(this);
-    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
-             UnsupportedLookAndFeelException e) {
-      // just ignore
+    private JMenu generateTestMenu() {
+        TestMenu = new JMenu("Тесты");
+        TestMenu.setMnemonic(KeyEvent.VK_T);
+        TestMenu.getAccessibleContext().setAccessibleDescription("Тестовые команды");
+        TestMenu.add(generateMenuItem("Сообщение в лог", KeyEvent.VK_S, event -> {
+            Logger.debug("Новая строка");
+        }));
+        return TestMenu;
     }
-  }
+
+    private JMenu generateCloseMenu() {
+        CloseMenu = new JMenu("Приложение");
+        CloseMenu.setMnemonic(KeyEvent.VK_ESCAPE);
+        CloseMenu.getAccessibleContext().setAccessibleDescription("Закрыть");
+        CloseMenu.add(generateMenuItem("Выход", KeyEvent.VK_ESCAPE, event -> {
+            showConfirmDialog();
+        }));
+        return CloseMenu;
+    }
+
+    public void showConfirmDialog() {
+        int select = JOptionPane.showConfirmDialog(this, bundle.getString("confirm_message"),
+                bundle.getString("confirm_window"),
+                JOptionPane.YES_NO_OPTION);
+
+        if (select == JOptionPane.YES_OPTION) {
+            dispose();
+            System.exit(0);
+        }
+    }
+
+    private JMenuItem generateMenuItem(String name, int keyEvent, ActionListener actionListener) {
+        JMenuItem item = new JMenuItem(name, keyEvent);
+        item.addActionListener(actionListener);
+        MenuItem.add(item);
+        return item;
+    }
+
+    private void setLookAndFeel(String className) {
+        try {
+            UIManager.setLookAndFeel(className);
+            SwingUtilities.updateComponentTreeUI(this);
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
+                 UnsupportedLookAndFeelException e) {
+            // just ignore
+        }
+    }
 }
