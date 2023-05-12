@@ -35,6 +35,7 @@ public class MainApplicationFrame extends JFrame {
     private JMenu CloseMenu;
     private final GameWindow gameWindow;
     private final LogWindow logWindow;
+    private final CoordinateWindow coordinateWindow;
     private final Properties cfg = new Properties();
     private final JDesktopPane desktopPane = new JDesktopPane();
     public List<JMenuItem> MenuItem = new ArrayList<>();
@@ -57,13 +58,25 @@ public class MainApplicationFrame extends JFrame {
 
         setContentPane(desktopPane);
 
+        coordinateWindow = createCoordinateWindow();
+        addWindow(coordinateWindow);
         logWindow = createLogWindow();
-        gameWindow = createGameWindow();
         addWindow(logWindow);
+        gameWindow = createGameWindow();
         addWindow(gameWindow);
+
         loadWindows();
         setJMenuBar(generateMenuBar());
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+        bundle = ResourceBundle.getBundle("resources.MyResources", new Locale("ru", "RU"));
+    }
+
+    private CoordinateWindow createCoordinateWindow() {
+        CoordinateWindow coordinateWindow = new CoordinateWindow();
+        coordinateWindow.setLocation(100, 50);
+        setMinimumSize(coordinateWindow.getSize());
+        coordinateWindow.pack();
+        return coordinateWindow;
     }
 
     protected LogWindow createLogWindow() {
@@ -77,7 +90,7 @@ public class MainApplicationFrame extends JFrame {
     }
 
     protected GameWindow createGameWindow(){
-        GameWindow gameWindow = new GameWindow();
+        GameWindow gameWindow = new GameWindow(coordinateWindow);
         gameWindow.setVisible(true);
         gameWindow.setLocation(20, 20);
         gameWindow.setSize(400,400);
