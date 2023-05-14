@@ -24,6 +24,8 @@ public class MainApplicationFrame extends JFrame {
     private JMenu VisionMenu;
     private JMenu TestMenu;
     private JMenu CloseMenu;
+    private GameWindow gameWindow;
+    private LogWindow logWindow;
     private final JDesktopPane desktopPane = new JDesktopPane();
     public List<JMenuItem> MenuItem = new ArrayList<>();
 
@@ -37,18 +39,19 @@ public class MainApplicationFrame extends JFrame {
 
         setContentPane(desktopPane);
 
-        addWindow(createLogWindow());
-        addWindow(new GameWindow() {
-            {
-                setSize(400, 400);
-            }
-        });
+        logWindow = createLogWindow();
+        gameWindow = createGameWindow();
+        addWindow(logWindow);
+        addWindow(gameWindow);
+        bundle = ResourceBundle.getBundle("resources.MyResources", new Locale("ru", "RU"));
+        UIManager.put("OptionPane.yesButtonText", bundle.getString("Да"));
+        UIManager.put("OptionPane.noButtonText", bundle.getString("Нет"));
         setJMenuBar(generateMenuBar());
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
     protected LogWindow createLogWindow() {
-        LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource());
+        logWindow = new LogWindow(Logger.getDefaultLogSource());
         logWindow.setLocation(10, 10);
         logWindow.setSize(300, 800);
         setMinimumSize(logWindow.getSize());
@@ -56,6 +59,16 @@ public class MainApplicationFrame extends JFrame {
         Logger.debug("Протокол работает");
         return logWindow;
     }
+
+    protected GameWindow createGameWindow(){
+        gameWindow = new GameWindow();
+        gameWindow.setVisible(true);
+        gameWindow.setLocation(20, 20);
+        gameWindow.setSize(400,400);
+        setMinimumSize(gameWindow.getSize());
+        return gameWindow;
+    }
+
 
     protected void addWindow(JInternalFrame frame) {
         desktopPane.add(frame);
@@ -66,6 +79,8 @@ public class MainApplicationFrame extends JFrame {
         //Читаем переводы слов из файла с нужным нам языком
         bundle = ResourceBundle.getBundle("resources.MyResources", locale);
         //Заменяем названия менюшек и прочего
+        gameWindow.setTitle(bundle.getString("Игровое поле"));
+        logWindow.setTitle(bundle.getString("Протокол работает"));
         langMenu.setText(bundle.getString("Язык"));
         VisionMenu.setText(bundle.getString("Режим отображения"));
         TestMenu.setText(bundle.getString("Тесты"));
@@ -76,7 +91,6 @@ public class MainApplicationFrame extends JFrame {
         for (JMenuItem item : MenuItem) {
             item.setText(bundle.getString(item.getText()));
         }
-        pack();
     }
 
 //    protected JMenuBar createMenuBar() {

@@ -36,7 +36,11 @@ public class MyResources_fr extends ListResourceBundle {
             {"Нет", "Non"},
             {"Non", "Нет"},
             {"confirm_message", "Êtes-vous sûr ?"},
-            {"confirm_window", "Fenêtre de confirmation"}
+            {"confirm_window", "Fenêtre de confirmation"},
+            {"Игровое поле на фр", "Игровое поле"},
+            {"Игровое поле", "Игровое поле на фр"},
+            {"Протокол работат на фр", "Протокол работает"},
+            {"Протокол работает", "Протокол работат на фр"}
 
     };
 }
