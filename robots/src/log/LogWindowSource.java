@@ -14,9 +14,9 @@ import java.util.Collections;
  */
 public class LogWindowSource
 {
-    private int m_iQueueLength;
+    private final int m_iQueueLength;
     
-    private ArrayList<LogEntry> m_messages;
+    private final ArrayList<LogEntry> m_messages;
     private final ArrayList<LogChangeListener> m_listeners;
     private volatile LogChangeListener[] m_activeListeners;
     
@@ -47,9 +47,15 @@ public class LogWindowSource
     
     public void append(LogLevel logLevel, String strMessage)
     {
-        LogEntry entry = new LogEntry(logLevel, strMessage);
+        LogEntry entry = new LogEntry(logLevel, "["+m_iQueueLength+"]"+strMessage);
         m_messages.add(entry);
         LogChangeListener [] activeListeners = m_activeListeners;
+        if(size() >= m_iQueueLength)
+        {
+            m_messages.remove(0);
+
+        }
+        m_messages.add(entry);
         if (activeListeners == null)
         {
             synchronized (m_listeners)
@@ -61,10 +67,16 @@ public class LogWindowSource
                 }
             }
         }
-        for (LogChangeListener listener : activeListeners)
-        {
-            listener.onLogChanged();
-        }
+        else for (LogChangeListener listener : activeListeners)
+            {
+                if (m_listeners.contains(listener))
+                {
+                    listener.onLogChanged();
+                }
+                else{
+                    unregisterListener(listener);
+                }
+            }
     }
     
     public int size()
@@ -74,7 +86,7 @@ public class LogWindowSource
 
     public Iterable<LogEntry> range(int startFrom, int count)
     {
-        if (startFrom < 0 || startFrom >= m_messages.size())
+        if (startFrom < 0 || startFrom >= size())
         {
             return Collections.emptyList();
         }
