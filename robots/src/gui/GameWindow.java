@@ -3,9 +3,11 @@ package gui;
 import java.awt.BorderLayout;
 
 import javax.swing.JPanel;
-import serialization.SerializationInternalFrame;
 
-public class GameWindow extends SerializationInternalFrame
+import serialization.State;
+import serialization.AbstractSeriazationInternalFrame;
+
+public class GameWindow extends AbstractSeriazationInternalFrame implements State
 {
     private final GameVisualizer m_visualizer;
 
@@ -15,7 +17,7 @@ public class GameWindow extends SerializationInternalFrame
 
     public GameWindow()
     {
-        super("Игровое поле", true, true, true, true);
+        super("Игровое поле", true, true, true, true, "C:\\OOP\\robots\\src\\serialization\\gameWindow.dat");
         m_visualizer = new GameVisualizer();
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(m_visualizer, BorderLayout.CENTER);
@@ -23,4 +25,8 @@ public class GameWindow extends SerializationInternalFrame
         pack();
     }
 
+
+    public void setSize(){
+        setSize(400,400);
+    }
 }

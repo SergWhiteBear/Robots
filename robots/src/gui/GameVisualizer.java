@@ -153,7 +153,7 @@ public class GameVisualizer extends JPanel
     private static int round(double value)
     {
         return (int)(value + 0.5);
-    }
+    }// в геометрию
     
     @Override
     public void paint(Graphics g)
@@ -169,7 +169,7 @@ public class GameVisualizer extends JPanel
         g.fillOval(centerX - diam1 / 2, centerY - diam2 / 2, diam1, diam2);
     }
     
-    private static void drawOval(Graphics g, int centerX, int centerY, int diam1, int diam2)
+    private static void drawOval(Graphics g, int centerX, int centerY, int diam1, int diam2) // объединить с fill
     {
         g.drawOval(centerX - diam1 / 2, centerY - diam2 / 2, diam1, diam2);
     }
