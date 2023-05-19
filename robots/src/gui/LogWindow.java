@@ -1,24 +1,23 @@
 package gui;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-import java.awt.TextArea;
+import java.awt.*;
 
-import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 
 import log.LogChangeListener;
 import log.LogEntry;
 import log.LogWindowSource;
+import serialization.State;
+import serialization.AbstractSeriazationInternalFrame;
 
-public class LogWindow extends JInternalFrame implements LogChangeListener
+public class LogWindow extends AbstractSeriazationInternalFrame implements LogChangeListener, State
 {
-    private LogWindowSource m_logSource;
-    private TextArea m_logContent;
+    private final LogWindowSource m_logSource;
+    private final TextArea m_logContent;
 
     public LogWindow(LogWindowSource logSource) 
     {
-        super("Протокол работы", true, true, true, true);
+        super("Протокол работы", true, true, true, true, "C:\\OOP\\robots\\src\\serialization\\logWindow.dat");
         m_logSource = logSource;
         m_logSource.registerListener(this);
         m_logContent = new TextArea("");
@@ -46,5 +45,9 @@ public class LogWindow extends JInternalFrame implements LogChangeListener
     public void onLogChanged()
     {
         EventQueue.invokeLater(this::updateLogContent);
+    }
+
+    public void setSize() {
+        setSize(300, 800);
     }
 }
