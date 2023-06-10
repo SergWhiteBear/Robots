@@ -1,15 +1,17 @@
-package gui;
+package gui.Windows;
+
+import gui.GameVisual.GameVisualizer;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class GameWindowLoaded extends GameWindow{
+public class GameWindowLoaded extends GameWindow {
 
     public final GameVisualizer m_visualizer;
 
-    public GameWindowLoaded(){
+    public GameWindowLoaded() {
         super();
-        setPath("C:\\OOP\\robots\\src\\serialization\\gameWindow.dat");
+        setPath("C:\\Robots_KN-204\\gameWindow.dat");
         loadState();
         m_visualizer = new GameVisualizer();
         JPanel panel = new JPanel(new BorderLayout());
@@ -18,7 +20,7 @@ public class GameWindowLoaded extends GameWindow{
         pack();
     }
 
-    public void SetSize(){
+    public void SetSize() {
         setSize(getDimension());
     }
 

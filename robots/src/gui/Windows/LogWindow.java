@@ -1,31 +1,32 @@
-package gui;
+package gui.Windows;
 
-import log.LogEntry;
-import log.LogWindowSource;
-
-import javax.swing.*;
 import java.awt.*;
 
-public class LogWindowLoaded extends LogWindow {
+import javax.swing.JPanel;
+
+import log.LogChangeListener;
+import log.LogEntry;
+import log.LogWindowSource;
+import serialization.State;
+import serialization.AbstractSeriazationInternalFrame;
+
+public class LogWindow extends AbstractSeriazationInternalFrame implements LogChangeListener, State {
     private final LogWindowSource m_logSource;
-    private TextArea m_logContent;
+    private final TextArea m_logContent;
 
-    public LogWindowLoaded(LogWindowSource logSource) {
-        super(logSource);
-        setPath("C:\\OOP\\robots\\src\\serialization\\logWindow.dat");
-
+    public LogWindow(LogWindowSource logSource) {
+        super("Протокол работы", true, true, true, true, "C:\\Robots_KN-204\\logWindow.dat");
         m_logSource = logSource;
         m_logSource.registerListener(this);
-
         m_logContent = new TextArea("");
-        loadState();
+        m_logContent.setSize(200, 500);
+
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(m_logContent, BorderLayout.CENTER);
         getContentPane().add(panel);
         pack();
+        updateLogContent();
     }
-
-
 
     private void updateLogContent() {
         StringBuilder content = new StringBuilder();
@@ -42,7 +43,6 @@ public class LogWindowLoaded extends LogWindow {
     }
 
     public void setSize() {
-        m_logContent.setSize(getDimension());
+        setSize(300, 800);
     }
-
 }

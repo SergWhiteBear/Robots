@@ -10,7 +10,7 @@ public abstract class AbstractSeriazationInternalFrame extends JInternalFrame im
   public Dimension dim;
   public int x, y;
   public boolean resizable, closable, maximizable, iconifiable;
-  public String path;
+  public String path = "C:\\Robots_KN-204";
   public AbstractSeriazationInternalFrame(String title, boolean resizable, boolean closable, boolean maximizable, boolean iconifiable, String outPath){
     super(title,resizable,closable,maximizable,iconifiable);
     setPath(outPath);

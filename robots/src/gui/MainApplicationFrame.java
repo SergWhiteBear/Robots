@@ -18,6 +18,10 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 
+import gui.Windows.GameWindow;
+import gui.Windows.GameWindowLoaded;
+import gui.Windows.LogWindow;
+import gui.Windows.LogWindowLoaded;
 import log.Logger;
 
 
@@ -54,11 +58,10 @@ public class MainApplicationFrame extends JFrame {
         setBounds(inset, inset, screenSize.width - inset * 2, screenSize.height - inset * 2);
 
         int load = showLoadedConfirm();
-        if (load == JOptionPane.YES_OPTION){
+        if (load == JOptionPane.YES_OPTION) {
             gameWindow = createGameWindowLoaded();
             logWindow = createLogWindowLoaded();
-        }
-        else{
+        } else {
             gameWindow = createGameWindow();
             logWindow = createLogWindow();
         }
@@ -103,7 +106,7 @@ public class MainApplicationFrame extends JFrame {
         return logWindow;
     }
 
-    protected GameWindow createGameWindow(){
+    protected GameWindow createGameWindow() {
         GameWindow gameWindow = new GameWindow();
         gameWindow.setVisible(true);
         gameWindow.setLocation();
@@ -112,7 +115,8 @@ public class MainApplicationFrame extends JFrame {
         desktopPane.add(gameWindow);
         return gameWindow;
     }
-    protected GameWindow createGameWindowLoaded(){
+
+    protected GameWindow createGameWindowLoaded() {
         GameWindowLoaded gameWindow = new GameWindowLoaded();
         gameWindow.setVisible(true);
         gameWindow.setLocation();
@@ -160,36 +164,6 @@ public class MainApplicationFrame extends JFrame {
             item.setText(bundle.getString(item.getText()));
         }
     }
-
-//    protected JMenuBar createMenuBar() {
-//        JMenuBar menuBar = new JMenuBar();
-//
-//        //Set up the lone menu.
-//        JMenu menu = new JMenu("Document");
-//        menu.setMnemonic(KeyEvent.VK_D);
-//        menuBar.add(menu);
-//
-//        //Set up the first menu item.
-//        JMenuItem menuItem = new JMenuItem("New");
-//        menuItem.setMnemonic(KeyEvent.VK_N);
-//        menuItem.setAccelerator(KeyStroke.getKeyStroke(
-//                KeyEvent.VK_N, ActionEvent.ALT_MASK));
-//        menuItem.setActionCommand("new");
-////        menuItem.addActionListener(this);
-//        menu.add(menuItem);
-//
-//        //Set up the second menu item.
-//        menuItem = new JMenuItem("Quit");
-//        menuItem.setMnemonic(KeyEvent.VK_Q);
-//        menuItem.setAccelerator(KeyStroke.getKeyStroke(
-//                KeyEvent.VK_Q, ActionEvent.ALT_MASK));
-//        menuItem.setActionCommand("quit");
-////        menuItem.addActionListener(this);
-//        menu.add(menuItem);
-//
-//        return menuBar;
-//    }
-
 
     private JMenuBar generateMenuBar() {
         JMenuBar menuBar = new JMenuBar();
@@ -266,7 +240,7 @@ public class MainApplicationFrame extends JFrame {
         }
     }
 
-    public int showLoadedConfirm(){
+    public int showLoadedConfirm() {
         return JOptionPane.showConfirmDialog(this, "Загрузить сохраненное состояние?",
                 bundle.getString("confirm_window"),
                 JOptionPane.YES_NO_OPTION);
