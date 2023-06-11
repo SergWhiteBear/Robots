@@ -3,6 +3,9 @@ package gui.GameVisual;
 import gui.GameVisual.Position.RobotPosition;
 import gui.GameVisual.Position.TargetPosition;
 
+/*
+Класс с переменными робота
+ */
 public class Robot {
 
     public RobotPosition robotPos = new RobotPosition();

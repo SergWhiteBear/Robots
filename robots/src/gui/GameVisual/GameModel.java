@@ -4,7 +4,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /*
-Класс отвечающий за модель робота
+РљР»Р°СЃСЃ РѕС‚РІРµС‡Р°СЋС‰РёР№ Р·Р° РёРіСЂРѕРІСѓСЋ РјРѕРґРµР»СЊ
  */
 
 public class GameModel {

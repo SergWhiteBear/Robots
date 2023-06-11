@@ -5,7 +5,7 @@ import gui.GameVisual.Position.TargetPosition;
 
 
 /*
-Класс отвечающий за геометрию
+РљР»Р°СЃСЃ СЃ РіРµРѕРјРµС‚СЂРёРµР№ РёРіСЂС‹
  */
 
 public class GameGeometry {
@@ -63,7 +63,7 @@ public class GameGeometry {
 
     protected static int round(double value) {
         return (int) (value + 0.5);
-    }// в геометрию
+    }// пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 
     protected boolean unreachable(final Robot robot) {
