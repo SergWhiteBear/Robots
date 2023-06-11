@@ -12,16 +12,14 @@ import java.util.TimerTask;
 
 import javax.swing.JPanel;
 
+/*
+Класс отвечающий за отрисовку робота
+ */
+
 public class GameVisualizer extends JPanel implements InteractionWithModel {
-    private final Timer m_timer = initTimer();
     private final GameModel model = new GameModel();
     private final Controller controller = new Controller(this);
 
-
-    private static Timer initTimer() {
-        Timer timer = new Timer("events generator", true);
-        return timer;
-    }
 
     @Override
     public void paint(Graphics g) {

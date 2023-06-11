@@ -18,10 +18,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 
-import gui.Windows.GameWindow;
-import gui.Windows.GameWindowLoaded;
-import gui.Windows.LogWindow;
-import gui.Windows.LogWindowLoaded;
+import gui.Windows.*;
 import log.Logger;
 
 
@@ -125,6 +122,7 @@ public class MainApplicationFrame extends JFrame {
         desktopPane.add(gameWindow);
         return gameWindow;
     }
+
 
 //    private void saveWindows() {
 //        if (Boolean.parseBoolean(cfg.getProperty("isGameWindowSerializable"))) {

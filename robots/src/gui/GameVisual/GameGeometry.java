@@ -3,6 +3,11 @@ package gui.GameVisual;
 import gui.GameVisual.Position.RobotPosition;
 import gui.GameVisual.Position.TargetPosition;
 
+
+/*
+Класс отвечающий за геометрию
+ */
+
 public class GameGeometry {
 
     protected static double distance(TargetPosition targetPos, RobotPosition robotPos) {
